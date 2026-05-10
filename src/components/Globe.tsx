@@ -268,12 +268,18 @@ export default function Globe({ mode, onSiteClick, onSatCountChange }: Props) {
         .atmosphereAltitude(0.18);
 
       globe.width(el.offsetWidth).height(el.offsetHeight);
-      globe.controls().autoRotate = true;
-      globe.controls().autoRotateSpeed = 0.3;
-      globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
       globeRef.current = globe;
       applyMode(globe, 'live');
+
+      // Controls and renderer are only available after the first render tick
+      requestAnimationFrame(() => {
+        const controls = globe.controls();
+        if (controls) {
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.3;
+        }
+        try { globe.renderer().setPixelRatio(Math.min(window.devicePixelRatio, 2)); } catch (_) {}
+      });
     });
 
     const onResize = () => {
